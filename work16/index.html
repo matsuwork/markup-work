@@ -8,8 +8,19 @@
     <title>TerraceTechフロントエンドエンジニア養成所</title>
   </head>
   <body>
+    <button id="open-btn">Please Click</button>
     <div>
       <ul></ul>
+    </div>
+    <div class="modal">
+      <div class="modal__content">
+        <form name="form" id="req-form">
+          <p class="form__text">番号と名前を入れてください</p>
+          <div><label for="num-text">番号</label><input type="number" name="number" id="num-text"></div>
+          <div><label for="name-text">名前</label><input type="text" name="text" id="name-text"></div>
+          <input type="submit" value="送信" id="req-btn">
+        </form>
+      </div>
     </div>
     <script src="js/script.js"></script>
   </body>
