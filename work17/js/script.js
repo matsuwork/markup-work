@@ -27,18 +27,26 @@ function getObject() {
     });
 };
 
-const num = 4;
+let cat;
+if(sessionStorage.getItem('selectedCategory')){
+    cat = sessionStorage.getItem('selectedCategory');
+} else {
+    cat = sessionStorage.setItem('selectedCategory','news');
+}
+
+const maxNum = 4;
 const ul = document.querySelector('ul');
 const img = document.createElement('img');
 
-function writeMenu(array) {
+function writeMenu(obj) {
     let menuUl = document.createElement('ul');
 
-    Object.keys(array).forEach(function (key) {
+    Object.keys(obj).forEach(function (key) {
         let menuLi = document.createElement('li');
-        menuLi.textContent = array[key].jp;
+        menuLi.textContent = obj[key].jp;
         menuLi.addEventListener('click', function(){
-            writeLists(array[key])
+            sessionStorage.selectedCategory = key
+            writeLists(obj[key])
         }, false);
         menuUl.appendChild(menuLi);
     });
@@ -84,7 +92,7 @@ async function tryOnLoad() {
     try {
         let resObject = await getObject();
         writeMenu(resObject);
-        writeLists(resObject.news)
+        writeLists(resObject[cat])
     } catch (err) {
         console.error(err);
         ul.innerHTML = 'エラーが発生しました';
