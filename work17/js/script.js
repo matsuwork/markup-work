@@ -5,7 +5,8 @@ const object = {
             {title: "ニュースの記事タイトル１", new: true, comment:0, url:"news1.html"},
             {title: "ニュースの記事タイトル２", new: true, comment:1, url:"news2.html"},
             {title: "ニュースの記事タイトル３", new: false, comment:3, url:"news3.html"},
-            {title: "ニュースの記事タイトル４", new: false, comment:10, url:"news4.html"},
+            //{title: "ニュースの記事タイトル４", new: false, comment:10, url:"news4.html"}
+            //3つしかなければ3つまで表示するtest
         ],
         img: "img/news.png"
     },
@@ -13,9 +14,10 @@ const object = {
         jp: "経済",
         data: [
             {title: "経済の記事タイトル１", new: true, comment:0, url:"economy1.html"},
-            {title: "経済の記事タイトル２", new: false, comment:9, url:"economy1.html"},
-            {title: "経済の記事タイトル３", new: false, comment:33, url:"economy1.html"},
-            {title: "経済の記事タイトル４", new: true, comment:4, url:"economy1.html"},
+            {title: "経済の記事タイトル２", new: false, comment:9, url:"economy2.html"},
+            {title: "経済の記事タイトル３", new: false, comment:33, url:"economy3.html"},
+            {title: "経済の記事タイトル４", new: true, comment:4, url:"economy4.html"},
+            {title: "経済の記事タイトル５", new: true, comment:0, url:"economy5.html"},
         ],
         img: "img/economy.png"
     }
@@ -27,39 +29,41 @@ function getObject() {
     });
 };
 
-let cat;
-if(sessionStorage.getItem('selectedCategory')){
-    cat = sessionStorage.getItem('selectedCategory');
-} else {
-    cat = sessionStorage.setItem('selectedCategory','news');
-}
+function getCategory() {
+    return new Promise((resolve, reject) => {
+        //選択されているカテゴリーの読み込み（なければ初期設定）
+        if(sessionStorage.getItem('selectedCategory') == null){
+            sessionStorage.selectedCategory = 'news';
+        }
+        resolve(sessionStorage.getItem('selectedCategory'));
+    });
+};
 
 const maxNum = 4;
-const container = document.querySelector('.container');
 
+const div = document.querySelector('div');
+div.classList.add('container');
 const ul = document.querySelector('ul');
 ul.classList.add('contents');
-const img = document.createElement('img');
 const menuUl = document.createElement('ul');
 menuUl.classList.add('menu');
+const img = document.createElement('img');
 
 function writeMenu(obj) {
     Object.keys(obj).forEach(function (key) {
         let menuLi = document.createElement('li');
         menuLi.classList.add('menu__list');
         menuLi.textContent = obj[key].jp;
-        menuLi.addEventListener('click', function(){
+        menuLi.addEventListener('click', function(){//タブの切り替え
             sessionStorage.selectedCategory = key
-            for (let i = 0 ; i < menuUl.children.length ; i++){
-                menuUl.children.item(i).classList.remove('is-active');
-            }
+            document.querySelector('.is-active').classList.remove('is-active');
             menuLi.classList.add('is-active');
             writeLists(obj[key])
         }, false);
         menuUl.appendChild(menuLi);
     });
 
-    container.before(menuUl)
+    div.before(menuUl);
 }
 
 function writeLists(obj) {
@@ -67,7 +71,15 @@ function writeLists(obj) {
     ul.innerHTML = '';
     let fragment = document.createDocumentFragment();
 
-    for (var i = 0 ; i < array.length ; i++) {
+    //何回繰り返すか
+    let maxI;
+    if(array.length > maxNum){
+        maxI = maxNum;
+    } else {
+        maxI = array.length;
+    }
+
+    for (var i = 0 ; i < maxI ; i++) {
 
         let li = document.createElement('li');
         li.classList.add('contents__list');
@@ -103,10 +115,14 @@ function writeLists(obj) {
 async function tryOnLoad() {
     try {
         let resObject = await getObject();
+        let resCategory = await getCategory();
         writeMenu(resObject);
-        let i = Object.keys(resObject).findIndex( value => value == cat );
+        //選択されているカテゴリーをアクティブにする
+        var i = Object.keys(resObject).indexOf(resCategory);
+        console.log(i + resCategory)
         menuUl.children.item(i).classList.add('is-active');
-        writeLists(resObject[cat])
+
+        writeLists(resObject[resCategory]);
     } catch (err) {
         console.error(err);
         ul.innerHTML = 'エラーが発生しました';
@@ -115,4 +131,4 @@ async function tryOnLoad() {
     }
 };
 
-tryOnLoad();
+window.onload = tryOnLoad;
