@@ -16,16 +16,18 @@ const image = [
     {"src" : "img/img4.jpg", "alt" : "画像４"},
     {"src" : "img/img5.jpg", "alt" : "画像５"}
 ]}
+*/
 
-async function getImage() {
+function getPromiseObject() {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve(image);
+            const response = fetch('https://jsondata.okiba.me/v1/json/grhYz210215052753');
+            resolve(response);
         }, 3000);
     });
 };
 
-*/
+
 
 const div = document.querySelector('div');
 div.classList.add('display')
@@ -100,7 +102,7 @@ async function tryOnLoad() {
     ul.appendChild(loading);
 
     try {
-        const response = await fetch('https://jsondata.okiba.me/v1/json/grhYz210215052753');
+        const response = await getPromiseObject();
         const resJson = await response.json();
         const resImage = resJson.image;
         let fragment = document.createDocumentFragment();
