@@ -5,7 +5,7 @@ const image = [
     {src: "img/img2.jpg", alt: "画像２"},
     {src: "img/img3.jpg", alt: "画像３"},
     {src: "img/img4.jpg", alt: "画像４"},
-    {src: "img/img5.jpg", alt: "画像５"},
+    {src: "img/img5.jpg", alt: "画像５"}
 ];
 
 **json
@@ -28,16 +28,43 @@ function getPromiseObject() {
 };
 
 
-
-const div = document.querySelector('div');
-div.classList.add('display')
-const ul = document.querySelector('ul');
-ul.classList.add('slide');
+//global
+const slideUl = document.querySelector('ul');
+slideUl.classList.add('slide');
 const controlDiv = document.createElement('div');
 controlDiv.classList.add('control')
 
-function writeControl() {
-    const div = document.querySelector('div');
+function initDisplay(resImage) {
+    const fragment = document.createDocumentFragment();
+
+    for (var i = 0 ; i < resImage.length ; i++) {
+        let li = document.createElement('li');
+        li.classList.add('slide__list');
+        let img = document.createElement('img');
+        img.src = resImage[i].src;
+        img.alt = resImage[i].alt;
+        img.width = 400;
+
+        if(i == 0) {
+            li.classList.add('is-active');
+        };
+
+        if(i < resImage.length - 1 ) {
+            img.addEventListener('click', function(){
+                next();
+            }, false);
+        }
+
+        li.appendChild(img);
+        fragment.appendChild(li);
+    }
+
+    slideUl.appendChild(fragment);
+}
+
+function initControl() {
+    const displayDiv = document.querySelector('div');
+    displayDiv.classList.add('display')
 
     const prevButton = document.createElement('button');
     prevButton.type = 'button';
@@ -53,10 +80,10 @@ function writeControl() {
         next();
     }, false);
 
-    ul.before(prevButton);
-    ul.after(nextButton);
+    slideUl.before(prevButton);
+    slideUl.after(nextButton);
 
-    div.after(controlDiv)
+    displayDiv.after(controlDiv)
 }
 
 function updateControl() {
@@ -66,8 +93,8 @@ function updateControl() {
     let index = lists.indexOf( activeLi ) ;
     controlDiv.textContent = `${index + 1}/${lists.length}`;
 
-    const prevButton = ul.previousElementSibling;
-    const nextButton = ul.nextElementSibling;
+    const prevButton = slideUl.previousElementSibling;
+    const nextButton = slideUl.nextElementSibling;
 
     if(index == 0){
         prevButton.disabled = true;
@@ -99,48 +126,18 @@ function next() {
 async function tryOnLoad() {
     const loading = document.createElement('img');
     loading.src = "img/loading-circle.gif";
-    ul.appendChild(loading);
+    slideUl.appendChild(loading);
 
     try {
         const response = await getPromiseObject();
         const resJson = await response.json();
         const resImage = resJson.image;
-        let fragment = document.createDocumentFragment();
-
-        for (var i = 0 ; i < resImage.length ; i++) {
-            let li = document.createElement('li');
-            li.classList.add('slide__list');
-            let img = document.createElement('img');
-            img.src = resImage[i].src;
-            img.alt = resImage[i].alt;
-            img.width = 400;
-
-            if(i == 0) {
-                li.classList.add('is-active');
-            };
-
-            if(i == resImage.length - 1 ) {
-                img.addEventListener('click', function(){
-                    li.classList.remove('is-active');
-                    ul.firstElementChild.classList.add('is-active');
-                    updateControl();
-                }, false);
-            } else {
-                img.addEventListener('click', function(){
-                    next();
-                }, false);
-            }
-            li.appendChild(img);
-            fragment.appendChild(li);
-        }
-
-        ul.appendChild(fragment);
-        writeControl();
+        initDisplay(resImage);
+        initControl();
         updateControl();
-
     } catch (err) {
         console.error(err);
-        ul.innerHTML = 'エラーが発生しました';
+        slideUl.innerHTML = 'エラーが発生しました';
     } finally {
         loading.remove();
         console.log("処理を終了しました");

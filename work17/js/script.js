@@ -1,27 +1,34 @@
 const object = {
     news: {
         jp: "ニュース",
-        data: [
-            {title: "ニュースの記事タイトル１", new: true, comment:0, url:"news1.html"},
-            {title: "ニュースの記事タイトル２", new: true, comment:1, url:"news2.html"},
-            {title: "ニュースの記事タイトル３", new: false, comment:3, url:"news3.html"},
-            //{title: "ニュースの記事タイトル４", new: false, comment:10, url:"news4.html"}
+        articles: [
+            {title: "ニュースの記事タイトル１", isNew: true, commentCount:0, url:"news1.html"},
+            {title: "ニュースの記事タイトル２", isNew: true, commentCount:1, url:"news2.html"},
+            {title: "ニュースの記事タイトル３", isNew: false, commentCount:3, url:"news3.html"},
             //3つしかなければ3つまで表示するtest
         ],
-        img: "img/news.png"
+        image: "img/news.png"
     },
     economy: {
         jp: "経済",
-        data: [
-            {title: "経済の記事タイトル１", new: true, comment:0, url:"economy1.html"},
-            {title: "経済の記事タイトル２", new: false, comment:9, url:"economy2.html"},
-            {title: "経済の記事タイトル３", new: false, comment:33, url:"economy3.html"},
-            {title: "経済の記事タイトル４", new: true, comment:4, url:"economy4.html"},
-            {title: "経済の記事タイトル５", new: true, comment:0, url:"economy5.html"},
+        articles: [
+            {title: "経済の記事タイトル１", isNew: true, commentCount:0, url:"economy1.html"},
+            {title: "経済の記事タイトル２", isNew: false, commentCount:9, url:"economy2.html"},
+            {title: "経済の記事タイトル３", isNew: false, commentCount:33, url:"economy3.html"},
+            {title: "経済の記事タイトル４", isNew: true, commentCount:4, url:"economy4.html"},
+            {title: "経済の記事タイトル５", isNew: true, commentCount:0, url:"economy5.html"},
         ],
-        img: "img/economy.png"
+        image: "img/economy.png"
     }
 };
+
+//global
+const maxNum = 4;//記事を何件まで表示させるか
+
+const contentUl = document.querySelector('ul');
+contentUl.classList.add('contents');
+const menuUl = document.createElement('ul');
+menuUl.classList.add('menu');
 
 function getObject() {
     return new Promise((resolve, reject) => {
@@ -29,57 +36,58 @@ function getObject() {
     });
 };
 
-function getCategory() {
+function getCategory(obj) {
     return new Promise((resolve, reject) => {
         //選択されているカテゴリーの読み込み（なければ初期設定）
         if(sessionStorage.getItem('selectedCategory') == null){
-            sessionStorage.selectedCategory = 'news';
+            sessionStorage.selectedCategory = Object.keys(obj)[0];
         }
         resolve(sessionStorage.getItem('selectedCategory'));
     });
 };
 
-const maxNum = 4;
+function updateMenu(obj, cat) {
+    sessionStorage.selectedCategory = cat;
+    if(document.querySelector('.is-active') !== null){
+        document.querySelector('.is-active').classList.remove('is-active');
+    }
+    //選択されているカテゴリーをアクティブにする
+    let index = Object.keys(obj).indexOf(cat);
+    menuUl.children.item(index).classList.add('is-active');
+}
 
-const div = document.querySelector('div');
-div.classList.add('container');
-const ul = document.querySelector('ul');
-ul.classList.add('contents');
-const menuUl = document.createElement('ul');
-menuUl.classList.add('menu');
-const img = document.createElement('img');
+function initMenu(obj) {
+    const containerDiv = document.querySelector('div');
+    containerDiv.classList.add('container');
 
-function writeMenu(obj) {
     Object.keys(obj).forEach(function (key) {
         let menuLi = document.createElement('li');
         menuLi.classList.add('menu__list');
         menuLi.textContent = obj[key].jp;
-        menuLi.addEventListener('click', function(){//タブの切り替え
-            sessionStorage.selectedCategory = key
-            document.querySelector('.is-active').classList.remove('is-active');
-            menuLi.classList.add('is-active');
-            writeLists(obj[key])
+        menuLi.addEventListener('click', function(){
+            updateMenu(obj, key);
+            updateContent(obj[key]);
         }, false);
         menuUl.appendChild(menuLi);
     });
 
-    div.before(menuUl);
+    containerDiv.before(menuUl);
 }
 
-function writeLists(obj) {
-    let array = obj.data;
-    ul.innerHTML = '';
+function updateContent(obj) {
+    contentUl.innerHTML = '';//初期化
+
+    let array = obj.articles;
     let fragment = document.createDocumentFragment();
 
-    //何回繰り返すか
-    let maxI;
+    let max;
     if(array.length > maxNum){
-        maxI = maxNum;
+        max = maxNum;
     } else {
-        maxI = array.length;
+        max = array.length;
     }
 
-    for (var i = 0 ; i < maxI ; i++) {
+    for (var i = 0 ; i < max ; i++) {
 
         let li = document.createElement('li');
         li.classList.add('contents__list');
@@ -87,17 +95,20 @@ function writeLists(obj) {
         a.innerHTML = array[i].title;
         a.href = array[i].url;
         li.appendChild(a);
+
+        //new
         let newSpan = document.createElement('span');
         newSpan.classList.add('new');
         newSpan.textContent = 'NEW'
 
-        if(array[i].new){
+        if(array[i].isNew){
             li.appendChild(newSpan);
         }
 
-        if(array[i].comment > 0){
+        //comment
+        if(array[i].commentCount > 0){
             let comSpan = document.createElement('span');
-            comSpan.textContent = array[i].comment;
+            comSpan.textContent = array[i].commentCount;
             comSpan.classList.add('comment');
             li.appendChild(comSpan);
         }
@@ -105,27 +116,29 @@ function writeLists(obj) {
         fragment.appendChild(li);
     }
 
-    ul.appendChild(fragment)
+    contentUl.appendChild(fragment)
 
-    img.src = obj.img;
-    img.alt = `${obj.jp}の画像`
-    ul.after(img)
+    const categoryImg = document.querySelector('img');
+    categoryImg.src = obj.image;
+    categoryImg.alt = `${obj.jp}の画像`
+};
+
+function initContent() {
+    const img = document.createElement('img');
+    contentUl.after(img);
 };
 
 async function tryOnLoad() {
     try {
         let resObject = await getObject();
-        let resCategory = await getCategory();
-        writeMenu(resObject);
-        //選択されているカテゴリーをアクティブにする
-        var i = Object.keys(resObject).indexOf(resCategory);
-        console.log(i + resCategory)
-        menuUl.children.item(i).classList.add('is-active');
-
-        writeLists(resObject[resCategory]);
+        let resCategory = await getCategory(resObject);
+        initMenu(resObject);
+        updateMenu(resObject,resCategory);
+        initContent();
+        updateContent(resObject[resCategory]);
     } catch (err) {
         console.error(err);
-        ul.innerHTML = 'エラーが発生しました';
+        contentUl.innerHTML = 'エラーが発生しました';
     } finally {
         console.log("処理を終了しました");
     }
