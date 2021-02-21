@@ -46,11 +46,11 @@ label {
     margin-right: 16px;
 }
 
-#open-btn {
+#js-open-btn {
     margin-bottom: 32px;
 }
 
-#req-btn {
+#js-req-btn {
     display: block;
     margin: 32px auto 0;
     width: 64px;

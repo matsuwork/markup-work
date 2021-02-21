@@ -10,12 +10,10 @@ const p = document.createElement('p');
 const formNumber = document.form.number;
 const formName = document.form.text;
 
-const openBtn = document.getElementById("open-btn")
-const reqBtn = document.getElementById("req-form");
+const openBtn = document.getElementById("js-open-btn")
+const reqBtn = document.getElementById("js-req-form");
 
 function openModal() {
-    formNumber.value = '';
-    formName.value = '';
     modal.classList.add("is-show");
     body.classList.add("no-scroll");
 }
@@ -25,45 +23,28 @@ function closeModal() {
     body.classList.remove("no-scroll");
 }
 
-function check(formPart) {
-    if(formPart.value == '') {
-        return false;
-    } else {
-        return true;
-    }
+function checkForm(formPart) {
+    return formPart.value !== ''
 }
 
-//フォームの値をPromiseで取得
-function getName() {
-    return new Promise((resolve, reject) => {
-        resolve(formName.value);
-    });
+function formatForm() {
+    formNumber.value = '';
+    formName.value = '';
 }
 
-function getNumber() {
-    return new Promise((resolve, reject) => {
-        resolve(formNumber.value);
-    });
-}
+function writeLists(data) {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0 ; i < data.length ; i++) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        const img = document.createElement('img');
 
-function writeLists(array) {
-    let fragment = document.createDocumentFragment();
-    for (var i = 0 ; i < array.length ; i++) {
-        let li = document.createElement('li');
-        let a = document.createElement('a');
-        let img = document.createElement('img');
-
-        let to = array[i].a;
-        let src = array[i].img;
-        let alt = array[i].alt;
-        let text = array[i].text;
-
-        a.href = to;
-        img.src = src;
-        img.alt = alt;
+        a.href = data[i].a;
+        img.src = data[i].img;
+        img.alt = data[i].alt;
         img.align = "left";
 
-        a.innerHTML = text;
+        a.innerHTML = data[i].text;
         a.appendChild(img);
         li.appendChild(a);
 
@@ -72,18 +53,10 @@ function writeLists(array) {
     ul.appendChild(fragment)
 }
 
-async function submitTry() {
-    closeModal();
-    ul.innerHTML = '';
-    ul.appendChild(loading);
-
+async function getJsondata() {
     try {
-        let resNum = await getNumber();
-        let resName = await getName();
-        console.log(`番号:${resNum}`)
-        console.log(`名前：${resName}`)
-        let response = await fetch('https://jsondata.okiba.me/v1/json/do9gM210114032953');
-        let resJson = await response.json();
+        const response = await fetch('https://jsondata.okiba.me/v1/json/do9gM210114032953');
+        const resJson = await response.json();
         writeLists(resJson.data);
     } catch (err) {
         console.error(err);
@@ -93,15 +66,30 @@ async function submitTry() {
     }
 }
 
-openBtn.addEventListener('click', openModal);
+openBtn.addEventListener('click', function(){
+    formatForm();
+    openModal();
+}, false);
+
 
 reqBtn.addEventListener('submit',  function(e) {
     e.preventDefault();
-    if(check(formNumber)&&check(formName)) {
-        submitTry();
-    } else if(check(formNumber) == false){
+    if(checkForm(formNumber)&&checkForm(formName)) {
+        closeModal();
+        ul.innerHTML = '';
+        ul.appendChild(loading);
+
+        const resNum = formNumber.value;
+        const resName = formName.value;
+        //課題では「Promiseを実行する手前でconsole.log出力されていればいいです」とあったのでconsoleを残しています。
+        //consoleを消すと、取得しても使うところがないのですがどうすればよいでしょうか。
+        console.log(`番号:${resNum}`)
+        console.log(`名前：${resName}`)
+
+        getJsondata();
+    } else if(checkForm(formNumber) == false){
         alert('番号を入力してください')
-    } else if(check(formName) == false){
+    } else if(checkForm(formName) == false){
         alert('名前を入力してください')
     }
 });
