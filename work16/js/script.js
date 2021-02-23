@@ -81,8 +81,6 @@ reqBtn.addEventListener('submit',  function(e) {
 
         const resNum = formNumber.value;
         const resName = formName.value;
-        //課題では「Promiseを実行する手前でconsole.log出力されていればいいです」とあったのでconsoleを残しています。
-        //consoleを消すと、取得しても使うところがないのですがどうすればよいでしょうか。
         console.log(`番号:${resNum}`)
         console.log(`名前：${resName}`)
 

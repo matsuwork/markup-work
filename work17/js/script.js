@@ -1,26 +1,38 @@
-const object = {
-    news: {
-        jp: "ニュース",
-        articles: [
-            {title: "ニュースの記事タイトル１", isNew: true, commentCount:0, url:"news1.html"},
-            {title: "ニュースの記事タイトル２", isNew: true, commentCount:1, url:"news2.html"},
-            {title: "ニュースの記事タイトル３", isNew: false, commentCount:3, url:"news3.html"},
-            //3つしかなければ3つまで表示するtest
+/*json
+{"data" : [
+    {
+        "id": "news",
+        "category_jp": "ニュース",
+        "articles": [
+            {"title": "ニュースの記事タイトル１", "isNew": true, "commentCount":0, "url":"news1.html"},
+            {"title": "ニュースの記事タイトル２", "isNew": true, "commentCount":1, "url":"news2.html"},
+            {"title": "ニュースの記事タイトル３", "isNew": false, "commentCount":3, "url":"news3.html"}
         ],
-        image: "img/news.png"
+        "image": "img/news.png"
     },
-    economy: {
-        jp: "経済",
-        articles: [
-            {title: "経済の記事タイトル１", isNew: true, commentCount:0, url:"economy1.html"},
-            {title: "経済の記事タイトル２", isNew: false, commentCount:9, url:"economy2.html"},
-            {title: "経済の記事タイトル３", isNew: false, commentCount:33, url:"economy3.html"},
-            {title: "経済の記事タイトル４", isNew: true, commentCount:4, url:"economy4.html"},
-            {title: "経済の記事タイトル５", isNew: true, commentCount:0, url:"economy5.html"},
+    {   "id": "economy",
+        "category_jp": "経済",
+        "articles": [
+            {"title": "経済の記事タイトル１", "isNew": true, "commentCount":0, "url":"economy1.html"},
+            {"title": "経済の記事タイトル２", "isNew": false, "commentCount":9, "url":"economy2.html"},
+            {"title": "経済の記事タイトル３", "isNew": false, "commentCount":33, "url":"economy3.html"},
+            {"title": "経済の記事タイトル４", "isNew": true, "commentCount":4, "url":"economy4.html"},
+            {"title": "経済の記事タイトル５", "isNew": true, "commentCount":0, "url":"economy5.html"}
         ],
-        image: "img/economy.png"
+        "image": "img/economy.png"
+    },
+    {   "id": "entame",
+        "category_jp": "エンタメ",
+        "articles": [
+            {"title": "エンタメの記事タイトル１", "isNew": false, "commentCount":0, "url":"entame1.html"},
+            {"title": "エンタメの記事タイトル２", "isNew": false, "commentCount":10, "url":"entame2.html"},
+            {"title": "エンタメの記事タイトル３", "isNew": true, "commentCount":30, "url":"entame3.html"},
+            {"title": "エンタメの記事タイトル４", "isNew": false, "commentCount":40, "url":"entame4.html"},
+        ],
+        "image": "img/entame.png"
     }
-};
+]}
+*/
 
 //global
 const maxNum = 4;//記事を何件まで表示させるか
@@ -30,87 +42,83 @@ contentUl.classList.add('contents');
 const menuUl = document.createElement('ul');
 menuUl.classList.add('menu');
 
-function getObject() {
-    return new Promise((resolve, reject) => {
-        resolve(object);
-    });
+function loadSession() {
+    //選択されているカテゴリーの取得（なければ初期設定）
+    if(sessionStorage.getItem('selectedCategory') == null){
+            sessionStorage.selectedCategory = 0;
+    }
+    return Number(sessionStorage.getItem('selectedCategory'));
 };
 
-function getCategory(obj) {
-    return new Promise((resolve, reject) => {
-        //選択されているカテゴリーの読み込み（なければ初期設定）
-        if(sessionStorage.getItem('selectedCategory') == null){
-            sessionStorage.selectedCategory = Object.keys(obj)[0];
-        }
-        resolve(sessionStorage.getItem('selectedCategory'));
-    });
-};
+function saveSession(index) {
+    sessionStorage.selectedCategory = index;
+}
 
-function updateMenu(obj, cat) {
-    sessionStorage.selectedCategory = cat;
+function activeMenu(index) {
+    //選択されているカテゴリーをアクティブにする
     if(document.querySelector('.is-active') !== null){
         document.querySelector('.is-active').classList.remove('is-active');
     }
-    //選択されているカテゴリーをアクティブにする
-    let index = Object.keys(obj).indexOf(cat);
     menuUl.children.item(index).classList.add('is-active');
 }
 
-function initMenu(obj) {
+function initMenu(data) {
     const containerDiv = document.querySelector('div');
     containerDiv.classList.add('container');
 
-    Object.keys(obj).forEach(function (key) {
-        let menuLi = document.createElement('li');
+    for(let i = 0 ; i < data.length ; i++){
+        const menuLi = document.createElement('li');
         menuLi.classList.add('menu__list');
-        menuLi.textContent = obj[key].jp;
+        menuLi.textContent = data[i].category_jp;
         menuLi.addEventListener('click', function(){
-            updateMenu(obj, key);
-            updateContent(obj[key]);
+            saveSession(i);
+            activeMenu(i);
+            writeContent(data[i]);
         }, false);
         menuUl.appendChild(menuLi);
-    });
+    };
 
     containerDiv.before(menuUl);
+
+    activeMenu(loadSession());
 }
 
-function updateContent(obj) {
+function writeContent(data) {
     contentUl.innerHTML = '';//初期化
 
-    let array = obj.articles;
-    let fragment = document.createDocumentFragment();
+    const articles = data.articles;
+    const fragment = document.createDocumentFragment();
 
     let max;
-    if(array.length > maxNum){
+    if(articles.length > maxNum){
         max = maxNum;
     } else {
-        max = array.length;
+        max = articles.length;
     }
 
     for (var i = 0 ; i < max ; i++) {
 
-        let li = document.createElement('li');
+        const li = document.createElement('li');
         li.classList.add('contents__list');
-        let a = document.createElement('a');
-        a.innerHTML = array[i].title;
-        a.href = array[i].url;
+        const a = document.createElement('a');
+        a.innerHTML = articles[i].title;
+        a.href = articles[i].url;
         li.appendChild(a);
 
         //new
-        let newSpan = document.createElement('span');
-        newSpan.classList.add('new');
-        newSpan.textContent = 'NEW'
-
-        if(array[i].isNew){
-            li.appendChild(newSpan);
+        if(articles[i].isNew){
+            const span = document.createElement('span');
+            span.classList.add('new');
+            span.textContent = 'NEW';
+            li.appendChild(span);
         }
 
         //comment
-        if(array[i].commentCount > 0){
-            let comSpan = document.createElement('span');
-            comSpan.textContent = array[i].commentCount;
-            comSpan.classList.add('comment');
-            li.appendChild(comSpan);
+        if(articles[i].commentCount > 0){
+            const span = document.createElement('span');
+            span.textContent = articles[i].commentCount;
+            span.classList.add('comment');
+            li.appendChild(span);
         }
 
         fragment.appendChild(li);
@@ -119,23 +127,23 @@ function updateContent(obj) {
     contentUl.appendChild(fragment)
 
     const categoryImg = document.querySelector('img');
-    categoryImg.src = obj.image;
-    categoryImg.alt = `${obj.jp}の画像`
+    categoryImg.src = data.image;
+    categoryImg.alt = `${data.jp}の画像`
 };
 
-function initContent() {
+function initContent(data) {
     const img = document.createElement('img');
     contentUl.after(img);
+    const index = loadSession();
+    writeContent(data[index]);
 };
 
-async function tryOnLoad() {
+async function getJsondata() {
     try {
-        let resObject = await getObject();
-        let resCategory = await getCategory(resObject);
-        initMenu(resObject);
-        updateMenu(resObject,resCategory);
-        initContent();
-        updateContent(resObject[resCategory]);
+        const response = await fetch('https://jsondata.okiba.me/v1/json/7iHN0210223065620');
+        const resJson = await response.json();
+        initMenu(resJson.data);
+        initContent(resJson.data);
     } catch (err) {
         console.error(err);
         contentUl.innerHTML = 'エラーが発生しました';
@@ -144,4 +152,4 @@ async function tryOnLoad() {
     }
 };
 
-window.onload = tryOnLoad;
+window.onload = getJsondata;
