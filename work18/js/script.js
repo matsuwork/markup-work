@@ -1,13 +1,4 @@
 /*
-**配列
-const image = [
-    {src: "img/img1.jpg", alt: "画像１"},
-    {src: "img/img2.jpg", alt: "画像２"},
-    {src: "img/img3.jpg", alt: "画像３"},
-    {src: "img/img4.jpg", alt: "画像４"},
-    {src: "img/img5.jpg", alt: "画像５"}
-];
-
 **json
 { "image": [
     {"src" : "img/img1.jpg", "alt" : "画像１"},
@@ -18,7 +9,7 @@ const image = [
 ]}
 */
 
-function getPromiseObject() {
+function getJson() {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             const response = fetch('https://jsondata.okiba.me/v1/json/grhYz210215052753');
@@ -27,20 +18,47 @@ function getPromiseObject() {
     });
 };
 
-
 //global
 const slideUl = document.querySelector('ul');
 slideUl.classList.add('slide');
-const controlDiv = document.createElement('div');
-controlDiv.classList.add('control')
 
-function initDisplay(resImage) {
+let slideLists;//.slide_listの配列　ロード時に設定
+
+function getActive() {
+    const activeLi = document.querySelector( '.is-active' ) ;
+    return slideLists.indexOf( activeLi );
+}
+
+function updateButton() {
+    const prevButton = slideUl.previousElementSibling;
+    const nextButton = slideUl.nextElementSibling;
+
+    if(getActive() == 0){
+        prevButton.disabled = true;
+    } else {
+        prevButton.disabled = false;
+    }
+
+    if(getActive() == slideLists.length - 1){
+        nextButton.disabled = true;
+    } else {
+        nextButton.disabled = false;
+    }
+}
+
+function updateCurrent() {
+    const currentDiv = document.querySelector('.current');
+    currentDiv.textContent = `${getActive() + 1}/${slideLists.length}`;
+}
+
+function initSlider(resImage) {
+    //image
     const fragment = document.createDocumentFragment();
 
-    for (var i = 0 ; i < resImage.length ; i++) {
-        let li = document.createElement('li');
+    for (let i = 0 ; i < resImage.length ; i++) {
+        const li = document.createElement('li');
         li.classList.add('slide__list');
-        let img = document.createElement('img');
+        const img = document.createElement('img');
         img.src = resImage[i].src;
         img.alt = resImage[i].alt;
         img.width = 400;
@@ -51,7 +69,7 @@ function initDisplay(resImage) {
 
         if(i < resImage.length - 1 ) {
             img.addEventListener('click', function(){
-                next();
+                nextImage();
             }, false);
         }
 
@@ -60,81 +78,64 @@ function initDisplay(resImage) {
     }
 
     slideUl.appendChild(fragment);
-}
+    //slideLists設定
+    slideLists = document.querySelectorAll( '.slide__list' ) ;
+    slideLists = [].slice.call( slideLists ) ;
 
-function initControl() {
-    const displayDiv = document.querySelector('div');
-    displayDiv.classList.add('display')
-
+    //button
     const prevButton = document.createElement('button');
     prevButton.type = 'button';
     prevButton.textContent = '◀';
     prevButton.addEventListener('click', function(){
-        prev();
+        prevImage();
     }, false);
 
     const nextButton = document.createElement('button');
     nextButton.type = 'button';
     nextButton.textContent = '▶';
     nextButton.addEventListener('click', function(){
-        next();
+        nextImage();
     }, false);
 
     slideUl.before(prevButton);
     slideUl.after(nextButton);
+    updateButton();
 
-    displayDiv.after(controlDiv)
+    //current
+    const displayDiv = document.querySelector('div');
+    displayDiv.classList.add('display')
+    const currentDiv = document.createElement('div');
+    currentDiv.classList.add('current')
+    displayDiv.after(currentDiv);
+    updateCurrent();
 }
 
-function updateControl() {
-    let lists = document.querySelectorAll( '.slide__list' ) ;
-    let activeLi = document.querySelector( '.is-active' ) ;
-    lists = [].slice.call( lists ) ;
-    let index = lists.indexOf( activeLi ) ;
-    controlDiv.textContent = `${index + 1}/${lists.length}`;
-
-    const prevButton = slideUl.previousElementSibling;
-    const nextButton = slideUl.nextElementSibling;
-
-    if(index == 0){
-        prevButton.disabled = true;
-    } else {
-        prevButton.disabled = false;
-    }
-
-    if(index == lists.length - 1){
-        nextButton.disabled = true;
-    } else {
-        nextButton.disabled = false;
-    }
-}
-
-function prev() {
-    let activeLi = document.querySelector('.is-active');
+function prevImage() {
+    const activeLi = document.querySelector('.is-active');
     activeLi.classList.remove('is-active');
     activeLi.previousElementSibling.classList.add('is-active');
-    updateControl();
+    updateButton();
+    updateCurrent();
 }
 
-function next() {
-    let activeLi = document.querySelector('.is-active');
+function nextImage() {
+    const activeLi = document.querySelector('.is-active');
     activeLi.classList.remove('is-active');
     activeLi.nextElementSibling.classList.add('is-active');
-    updateControl();
+    updateButton();
+    updateCurrent();
 }
 
-async function tryOnLoad() {
+async function getJsonimage() {
     const loading = document.createElement('img');
     loading.src = "img/loading-circle.gif";
     slideUl.appendChild(loading);
 
     try {
-        const response = await getPromiseObject();
+        const response = await getJson();
         const resJson = await response.json();
         const resImage = resJson.image;
-        initDisplay(resImage);
-        initControl();
-        updateControl();
+        initSlider(resImage);
     } catch (err) {
         console.error(err);
         slideUl.innerHTML = 'エラーが発生しました';
@@ -144,4 +145,4 @@ async function tryOnLoad() {
     }
 };
 
-window.onload = tryOnLoad;
+window.onload = getJsonimage;
