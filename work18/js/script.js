@@ -79,8 +79,7 @@ function initSlider(resImage) {
 
     slideUl.appendChild(fragment);
     //slideLists設定
-    slideLists = document.querySelectorAll( '.slide__list' ) ;
-    slideLists = [].slice.call( slideLists ) ;
+    slideLists = [...document.querySelectorAll( '.slide__list' )]
 
     //button
     const prevButton = document.createElement('button');
@@ -134,15 +133,16 @@ async function getJsonimage() {
     try {
         const response = await getJson();
         const resJson = await response.json();
-        const resImage = resJson.image;
-        initSlider(resImage);
+        return resJson.image;
     } catch (err) {
-        console.error(err);
-        slideUl.innerHTML = 'エラーが発生しました';
+        slideUl.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
+        throw err;
     } finally {
         loading.remove();
-        console.log("処理を終了しました");
     }
 };
 
-window.onload = getJsonimage;
+window.onload = async function(){
+    const resImage = await getJsonimage()
+    initSlider(resImage);
+}
