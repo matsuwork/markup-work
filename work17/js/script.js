@@ -139,17 +139,23 @@ function initContent(data) {
 };
 
 async function getJsondata() {
+    const loading = document.createElement('img');
+    loading.src = "img/loading-circle.gif";
+    contentUl.appendChild(loading);
     try {
         const response = await fetch('https://jsondata.okiba.me/v1/json/7iHN0210223065620');
         const resJson = await response.json();
-        initMenu(resJson.data);
-        initContent(resJson.data);
+        return resJson.data;
     } catch (err) {
-        console.error(err);
-        contentUl.innerHTML = 'エラーが発生しました';
+        contentUl.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
+        throw err;
     } finally {
-        console.log("処理を終了しました");
+        loading.remove();
     }
 };
 
-window.onload = getJsondata;
+window.onload = async function(){
+    const resData = await getJsondata();
+    initMenu(resData);
+    initContent(resData);
+}
