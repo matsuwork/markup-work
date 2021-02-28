@@ -57,10 +57,10 @@ async function getJsondata() {
     try {
         const response = await fetch('https://jsondata.okiba.me/v1/json/do9gM210114032953');
         const resJson = await response.json();
-        writeLists(resJson.data);
+        return resJson.data;
     } catch (err) {
-        console.error(err);
-        ul.innerHTML = 'エラーが発生しました';
+        ul.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
+        throw err;
     } finally {
         loading.remove();
     }
@@ -72,7 +72,7 @@ openBtn.addEventListener('click', function(){
 }, false);
 
 
-reqBtn.addEventListener('submit',  function(e) {
+reqBtn.addEventListener('submit',  async function(e) {
     e.preventDefault();
     if(checkForm(formNumber)&&checkForm(formName)) {
         closeModal();
@@ -84,7 +84,8 @@ reqBtn.addEventListener('submit',  function(e) {
         console.log(`番号:${resNum}`)
         console.log(`名前：${resName}`)
 
-        getJsondata();
+        const resData = await getJsondata();
+        writeLists(resData);
     } else if(checkForm(formNumber) == false){
         alert('番号を入力してください')
     } else if(checkForm(formName) == false){
