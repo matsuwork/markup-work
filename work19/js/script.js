@@ -1,15 +1,3 @@
-/*
-**json
-{ "data": [
-    {"ID" : 1, "名前" : "やまだ", "性別" : "男", "年齢" : 32},
-    {"ID" : 5, "名前" : "えのもと", "性別" : "女", "年齢" : 36},
-    {"ID" : 3, "名前" : "たなか", "性別" : "男", "年齢" : 25},
-    {"ID" : 4, "名前" : "あんどう", "性別" : "女", "年齢" : 48},
-    {"ID" : 2, "名前" : "さとう", "性別" : "女", "年齢" : 18}
-]}
-https://jsondata.okiba.me/v1/json/E9j1L210228051708
-*/
-
 function getJson() {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -21,12 +9,12 @@ function getJson() {
 
 //global
 const div = document.querySelector('div');
-const table = document.createElement('table');
 
 function initTable(data) {
+    const table = document.createElement('table');
     //table header
     const tr = document.createElement('tr');
-    Object.keys(data[0]).forEach(function (key) {
+    Object.keys(data[0]).forEach((key) => {
         const th = document.createElement('th');
         th.textContent = key;
         tr.appendChild(th);
@@ -38,6 +26,9 @@ function initTable(data) {
             ascendingButton.textContent = '▲';
             ascendingButton.addEventListener('click', function(){
                 ascendingSort(data,key);
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => button.disabled = false);
+                ascendingButton.disabled = true;
             }, false);
 
             const descendingButton = document.createElement('button');
@@ -45,27 +36,21 @@ function initTable(data) {
             descendingButton.textContent = '▼';
             descendingButton.addEventListener('click', function(){
                 descendingSort(data,key);
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => button.disabled = false);
+                descendingButton.disabled = true;
             }, false);
 
-            th.appendChild(ascendingButton);
-            th.appendChild(descendingButton);
+            const span = document.createElement('span');
+            span.appendChild(ascendingButton);
+            span.appendChild(descendingButton);
+            th.appendChild(span);
         }
     });
-    table.appendChild(tr);
+    div.appendChild(table).appendChild(tr);
 
     //table content
-    for (let i = 0 ; i < data.length ; i++) {
-        const tr = document.createElement('tr');
-
-        Object.keys(data[i]).forEach((key) => {
-            const td = document.createElement('td');
-            td.textContent = data[i][key];
-            tr.appendChild(td);
-        });
-        table.appendChild(tr);
-    }
-
-    div.appendChild(table);
+    writeContent(data);
 }
 
 //昇順
@@ -81,19 +66,22 @@ function descendingSort(data, key) {
 }
 
 function writeContent(data){
+    const table = document.querySelector('table');
     while( table.rows[ 1 ] ) table.deleteRow( 1 );
 
+    const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < data.length ; i++) {
         const tr = document.createElement('tr');
 
         Object.keys(data[i]).forEach((key) => {
-        const td = document.createElement('td');
+            const td = document.createElement('td');
             td.textContent = data[i][key];
             tr.appendChild(td);
         });
 
-        table.appendChild(tr);
+        fragment.appendChild(tr);
     }
+    table.appendChild(fragment);
 }
 
 
