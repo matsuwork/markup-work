@@ -7,8 +7,7 @@ function getJson() {
     });
 };
 
-//global
-const div = document.querySelector('div');
+const tableDiv = document.querySelector('#js-table');
 
 function initTable(data) {
     const table = document.createElement('table');
@@ -47,7 +46,7 @@ function initTable(data) {
             th.appendChild(span);
         }
     });
-    div.appendChild(table).appendChild(tr);
+    tableDiv.appendChild(table).appendChild(tr);
 
     //table content
     writeContent(data);
@@ -88,14 +87,14 @@ function writeContent(data){
 async function getJsondata() {
     const loading = document.createElement('img');
     loading.src = "img/loading-circle.gif";
-    div.appendChild(loading);
+    tableDiv.appendChild(loading);
 
     try {
         const response = await getJson();
         const resJson = await response.json();
         return resJson.data;
     } catch (err) {
-        div.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
+        tableDiv.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
         throw err;
     } finally {
         loading.remove();
