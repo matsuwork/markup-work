@@ -12,8 +12,9 @@ const tableDiv = document.querySelector('#js-table');
 function initTable(data) {
     const table = document.createElement('table');
     //table header
+    const keys = Object.keys(data[0]);
     const tr = document.createElement('tr');
-    Object.keys(data[0]).forEach((key) => {
+    keys.forEach((key) => {
         const th = document.createElement('th');
         th.textContent = key;
         tr.appendChild(th);
@@ -49,7 +50,17 @@ function initTable(data) {
     tableDiv.appendChild(table).appendChild(tr);
 
     //table content
-    writeContent(data);
+    const fragment = document.createDocumentFragment();
+    for (let i = 0 ; i < data.length ; i++) {
+        const tr = document.createElement('tr');
+        for(let j = 0 ; j < keys.length ; j++) {
+            const td = document.createElement('td');
+            tr.appendChild(td);
+        }
+        fragment.appendChild(tr);
+    }
+    table.appendChild(fragment);
+    writeContent(data)
 }
 
 //昇順
@@ -66,23 +77,15 @@ function descendingSort(data, key) {
 
 function writeContent(data){
     const table = document.querySelector('table');
-    while( table.rows[ 1 ] ) table.deleteRow( 1 );
+    const keys = Object.keys(data[0]);
 
-    const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < data.length ; i++) {
-        const tr = document.createElement('tr');
-
-        Object.keys(data[i]).forEach((key) => {
-            const td = document.createElement('td');
-            td.textContent = data[i][key];
-            tr.appendChild(td);
-        });
-
-        fragment.appendChild(tr);
+        for(let j = 0 ; j < keys.length ; j++) {
+            const targetTd = table.rows[i + 1].cells[j];
+            targetTd.innerHTML = data[i][keys[j]];
+        }
     }
-    table.appendChild(fragment);
 }
-
 
 async function getJsondata() {
     const loading = document.createElement('img');
