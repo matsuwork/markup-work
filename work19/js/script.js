@@ -25,7 +25,7 @@ function initTable(data) {
             ascendingButton.type = 'button';
             ascendingButton.textContent = '▲';
             ascendingButton.addEventListener('click', function(){
-                ascendingSort(data,key);
+                ascendingSort(data,keys,key);
                 const buttons = document.querySelectorAll('button');
                 buttons.forEach(button => button.disabled = false);
                 ascendingButton.disabled = true;
@@ -35,7 +35,7 @@ function initTable(data) {
             descendingButton.type = 'button';
             descendingButton.textContent = '▼';
             descendingButton.addEventListener('click', function(){
-                descendingSort(data,key);
+                descendingSort(data,keys,key);
                 const buttons = document.querySelectorAll('button');
                 buttons.forEach(button => button.disabled = false);
                 descendingButton.disabled = true;
@@ -60,25 +60,23 @@ function initTable(data) {
         fragment.appendChild(tr);
     }
     table.appendChild(fragment);
-    writeContent(data)
+    writeContent(data,keys)
 }
 
 //昇順
-function ascendingSort(data, key) {
+function ascendingSort(data, keys, key) {
     data.sort((a, b) => {return a[key] - b[key]});
-    writeContent(data);
+    writeContent(data,keys);
 }
 
 //降順
-function descendingSort(data, key) {
+function descendingSort(data, keys, key) {
     data.sort((a, b) => {return b[key] - a[key]});
-    writeContent(data);
+    writeContent(data,keys);
 }
 
-function writeContent(data){
+function writeContent(data,keys){
     const table = document.querySelector('table');
-    const keys = Object.keys(data[0]);
-
     for (let i = 0 ; i < data.length ; i++) {
         for(let j = 0 ; j < keys.length ; j++) {
             const targetTd = table.rows[i + 1].cells[j];
