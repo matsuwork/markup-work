@@ -65,14 +65,14 @@ function initTable(data) {
 
 //昇順
 function ascendingSort(data, keys, key) {
-    data.sort((a, b) => {return a[key] - b[key]});
-    writeContent(data,keys);
+    const sortedData = [...data].sort((a, b) => {return a[key] - b[key]});
+    writeContent(sortedData,keys);
 }
 
 //降順
 function descendingSort(data, keys, key) {
-    data.sort((a, b) => {return b[key] - a[key]});
-    writeContent(data,keys);
+    const sortedData = [...data].sort((a, b) => {return b[key] - a[key]});
+    writeContent(sortedData,keys);
 }
 
 function writeContent(data,keys){
