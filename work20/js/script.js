@@ -20,7 +20,7 @@ function initTable(data) {
         tr.appendChild(th);
 
         //button
-        if(key === "ID") {
+        if(key === "ID" || key === "年齢") {
             const ascendingButton = document.createElement('button');
             ascendingButton.type = 'button';
             ascendingButton.textContent = '▲';
