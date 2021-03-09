@@ -25,7 +25,8 @@ function initTable(data) {
             ascendingButton.type = 'button';
             ascendingButton.textContent = '▲';
             ascendingButton.addEventListener('click', function(){
-                ascendingSort(data,keys,key);
+                const sortedData = ascendingSort(data,key);
+                writeContent(sortedData,keys);
                 const buttons = document.querySelectorAll('button');
                 buttons.forEach(button => button.disabled = false);
                 ascendingButton.disabled = true;
@@ -35,7 +36,8 @@ function initTable(data) {
             descendingButton.type = 'button';
             descendingButton.textContent = '▼';
             descendingButton.addEventListener('click', function(){
-                descendingSort(data,keys,key);
+                const sortedData = descendingSort(data,key);
+                writeContent(sortedData,keys);
                 const buttons = document.querySelectorAll('button');
                 buttons.forEach(button => button.disabled = false);
                 descendingButton.disabled = true;
@@ -64,15 +66,15 @@ function initTable(data) {
 }
 
 //昇順
-function ascendingSort(data, keys, key) {
+function ascendingSort(data, key) {
     const sortedData = [...data].sort((a, b) => {return a[key] - b[key]});
-    writeContent(sortedData,keys);
+    return sortedData;
 }
 
 //降順
-function descendingSort(data, keys, key) {
+function descendingSort(data, key) {
     const sortedData = [...data].sort((a, b) => {return b[key] - a[key]});
-    writeContent(sortedData,keys);
+    return sortedData;
 }
 
 function writeContent(data,keys){
