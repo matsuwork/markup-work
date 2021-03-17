@@ -1,38 +1,50 @@
 const tableDiv = document.querySelector('#js-table');
-
 const MAX_ROW = 5;  //1ページに表示する項目数
-let currentPage = 1;
-const totalPage = (data) => data.length % MAX_ROW === 0 ? data.length / MAX_ROW : Math.floor(data.length / MAX_ROW) + 1;
 
-function updatePagenation(data) {
-    const p = document.querySelector('.current');
-    p.textContent = `${currentPage}/${totalPage(data)}`;
-
-    const prevButton = p.previousElementSibling;
-    const nextButton = p.nextElementSibling;
-
-    if(currentPage === 1){
-        prevButton.disabled = true;
-    } else {
-        prevButton.disabled = false;
+class Common {
+    constructor(data) {
+        this.data = data;
+        this.currentPage = 1;
+        this.sortType = 0;
+        this.sortKey = '';
     }
 
-    if(currentPage === totalPage(data)){
-        nextButton.disabled = true;
-    } else {
-        nextButton.disabled = false;
+    get data() {return this._data;}
+    set data(value) {this._data = value;}
+
+    get currentPage() {return this._currentPage;}
+    set currentPage(value) {this._currentPage = value;}
+
+    get sortType() {return this._sortType;}
+    set sortType(value) {this._sortType = value;}
+
+    get sortKey() {return this._sortKey;}
+    set sortKey(value) {this._sortKey = value;}
+
+    get keys() {return Object.keys(this.data[0]);}
+
+    get totalPage() {return this.data.length % MAX_ROW === 0 ? this.data.length / MAX_ROW : Math.floor(this.data.length / MAX_ROW) + 1;}
+
+    incrementCurrent() {this.currentPage++;}
+    decrementCurrent() {this.currentPage--;}
+
+    getContent() {
+        const sortedData = [...this.data].sort((a, b) => {return (a[this.sortKey] - b[this.sortKey]) * this.sortType});
+        const slicedData = sortedData.slice((this.currentPage - 1) * MAX_ROW, this.currentPage * MAX_ROW);
+        return slicedData;
     }
 }
 
-function writeContent(data,keys){
+function writeContent(){
+    const contentData = common.getContent();
     const table = document.querySelector('table');
-    const slicedData = data.slice((currentPage-1)*MAX_ROW,currentPage*MAX_ROW);
+
     for (let i = 0 ; i < MAX_ROW ; i++) {
-        for(let j = 0 ; j < keys.length ; j++) {
+        for(let j = 0 ; j < common.keys.length ; j++) {
             const targetTd = table.rows[i + 1].cells[j];
 
-            if(i < slicedData.length) {
-                targetTd.innerHTML = slicedData[i][keys[j]];
+            if(i < contentData.length) {
+                targetTd.innerHTML = contentData[i][common.keys[j]];
             } else {
                 targetTd.innerHTML = '';
             }
@@ -40,12 +52,37 @@ function writeContent(data,keys){
     }
 }
 
-function initTable(data) {
+function updatePagenation() {
+    const p = document.querySelector('.current');
+    p.textContent = `${common.currentPage}/${common.totalPage}`;
+
+    const prevButton = p.previousElementSibling;
+    const nextButton = p.nextElementSibling;
+
+    if(common.currentPage === 1){
+        prevButton.disabled = true;
+    } else {
+        prevButton.disabled = false;
+    }
+
+    if(common.currentPage === common.totalPage){
+        nextButton.disabled = true;
+    } else {
+        nextButton.disabled = false;
+    }
+}
+
+function updateSortButton(clickedButton) {
+    const buttons = document.querySelectorAll('.sort-button');
+    buttons.forEach(button => button.disabled = false);
+    clickedButton.disabled = true;
+}
+
+function initTable() {
     const table = document.createElement('table');
     //table header
-    const keys = Object.keys(data[0]);
     const tr = document.createElement('tr');
-    keys.forEach((key) => {
+    common.keys.forEach((key) => {
         const th = document.createElement('th');
         th.textContent = key;
         tr.appendChild(th);
@@ -57,13 +94,12 @@ function initTable(data) {
             ascendingButton.textContent = '▲';
             ascendingButton.classList.add('sort-button');
             ascendingButton.addEventListener('click', function(){
-                currentPage = 1;
-                updatePagenation(data);
-                const sortedData = ascendingSort(data,key);
-                writeContent(sortedData,keys);
-                const buttons = document.querySelectorAll('.sort-button');
-                buttons.forEach(button => button.disabled = false);
-                ascendingButton.disabled = true;
+                common.currentPage = 1;
+                common.sortType = 1;
+                common.sortKey = key;
+                writeContent();
+                updatePagenation();
+                updateSortButton(this);
             }, false);
 
             const descendingButton = document.createElement('button');
@@ -71,13 +107,12 @@ function initTable(data) {
             descendingButton.textContent = '▼';
             descendingButton.classList.add('sort-button');
             descendingButton.addEventListener('click', function(){
-                currentPage = 1;
-                updatePagenation(data);
-                const sortedData = descendingSort(data,key);
-                writeContent(sortedData,keys);
-                const buttons = document.querySelectorAll('.sort-button');
-                buttons.forEach(button => button.disabled = false);
-                descendingButton.disabled = true;
+                common.currentPage = 1;
+                common.sortType = -1;
+                common.sortKey = key;
+                writeContent();
+                updatePagenation();
+                updateSortButton(this);
             }, false);
 
             const span = document.createElement('span');
@@ -92,14 +127,13 @@ function initTable(data) {
     const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < MAX_ROW ; i++) {
         const tr = document.createElement('tr');
-        for(let j = 0 ; j < keys.length ; j++) {
+        for(let j = 0 ; j < common.keys.length ; j++) {
             const td = document.createElement('td');
             tr.appendChild(td);
         }
         fragment.appendChild(tr);
     }
     table.appendChild(fragment);
-    writeContent(data,keys)
 
     //pagenation
     //back
@@ -108,18 +142,18 @@ function initTable(data) {
     prevButton.textContent = '◀';
     prevButton.disabled = true;
     prevButton.addEventListener('click', function(){
-        currentPage--;
-        writeContent(data, keys);
-        updatePagenation(data);
+        common.decrementCurrent();
+        writeContent();
+        updatePagenation();
     }, false);
     //next
     const nextButton = document.createElement('button');
     nextButton.type = 'button';
     nextButton.textContent = '▶';
     nextButton.addEventListener('click', function(){
-        currentPage++;
-        writeContent(data, keys);
-        updatePagenation(data);
+        common.incrementCurrent();
+        writeContent();
+        updatePagenation();
     }, false);
     //current
     const p = document.createElement('p');
@@ -133,19 +167,8 @@ function initTable(data) {
     div.appendChild(p);
     div.appendChild(nextButton);
 
-    updatePagenation(data);
-}
-
-//昇順
-function ascendingSort(data, key) {
-    const sortedData = [...data].sort((a, b) => {return a[key] - b[key]});
-    return sortedData;
-}
-
-//降順
-function descendingSort(data, key) {
-    const sortedData = [...data].sort((a, b) => {return b[key] - a[key]});
-    return sortedData;
+    writeContent();
+    updatePagenation();
 }
 
 function getJson() {
@@ -175,6 +198,7 @@ async function getJsondata() {
 };
 
 window.onload = async function(){
-    const resData = await getJsondata()
-    initTable(resData);
+    const resData = await getJsondata();
+    common = new Common(resData);
+    initTable();
 }
