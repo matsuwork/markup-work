@@ -1,7 +1,7 @@
 const tableDiv = document.querySelector('#js-table');
 const MAX_ROW = 5;  //1ページに表示する項目数
 
-class Common {
+class Pagenation {
     constructor(data) {
         this.data = data;
         this.currentPage = 1;
@@ -36,15 +36,15 @@ class Common {
 }
 
 function writeContent(){
-    const contentData = common.getContent();
+    const contentData = pagenation.getContent();
     const table = document.querySelector('table');
 
     for (let i = 0 ; i < MAX_ROW ; i++) {
-        for(let j = 0 ; j < common.keys.length ; j++) {
+        for(let j = 0 ; j < pagenation.keys.length ; j++) {
             const targetTd = table.rows[i + 1].cells[j];
 
             if(i < contentData.length) {
-                targetTd.innerHTML = contentData[i][common.keys[j]];
+                targetTd.innerHTML = contentData[i][pagenation.keys[j]];
             } else {
                 targetTd.innerHTML = '';
             }
@@ -54,18 +54,18 @@ function writeContent(){
 
 function updatePagenation() {
     const p = document.querySelector('.current');
-    p.textContent = `${common.currentPage}/${common.totalPage}`;
+    p.textContent = `${pagenation.currentPage}/${pagenation.totalPage}`;
 
     const prevButton = p.previousElementSibling;
     const nextButton = p.nextElementSibling;
 
-    if(common.currentPage === 1){
+    if(pagenation.currentPage === 1){
         prevButton.disabled = true;
     } else {
         prevButton.disabled = false;
     }
 
-    if(common.currentPage === common.totalPage){
+    if(pagenation.currentPage === pagenation.totalPage){
         nextButton.disabled = true;
     } else {
         nextButton.disabled = false;
@@ -82,7 +82,7 @@ function initTable() {
     const table = document.createElement('table');
     //table header
     const tr = document.createElement('tr');
-    common.keys.forEach((key) => {
+    pagenation.keys.forEach((key) => {
         const th = document.createElement('th');
         th.textContent = key;
         tr.appendChild(th);
@@ -94,9 +94,9 @@ function initTable() {
             ascendingButton.textContent = '▲';
             ascendingButton.classList.add('sort-button');
             ascendingButton.addEventListener('click', function(){
-                common.currentPage = 1;
-                common.sortType = 1;
-                common.sortKey = key;
+                pagenation.currentPage = 1;
+                pagenation.sortType = 1;
+                pagenation.sortKey = key;
                 writeContent();
                 updatePagenation();
                 updateSortButton(this);
@@ -107,9 +107,9 @@ function initTable() {
             descendingButton.textContent = '▼';
             descendingButton.classList.add('sort-button');
             descendingButton.addEventListener('click', function(){
-                common.currentPage = 1;
-                common.sortType = -1;
-                common.sortKey = key;
+                pagenation.currentPage = 1;
+                pagenation.sortType = -1;
+                pagenation.sortKey = key;
                 writeContent();
                 updatePagenation();
                 updateSortButton(this);
@@ -127,7 +127,7 @@ function initTable() {
     const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < MAX_ROW ; i++) {
         const tr = document.createElement('tr');
-        for(let j = 0 ; j < common.keys.length ; j++) {
+        for(let j = 0 ; j < pagenation.keys.length ; j++) {
             const td = document.createElement('td');
             tr.appendChild(td);
         }
@@ -142,7 +142,7 @@ function initTable() {
     prevButton.textContent = '◀';
     prevButton.disabled = true;
     prevButton.addEventListener('click', function(){
-        common.decrementCurrent();
+        pagenation.decrementCurrent();
         writeContent();
         updatePagenation();
     }, false);
@@ -151,7 +151,7 @@ function initTable() {
     nextButton.type = 'button';
     nextButton.textContent = '▶';
     nextButton.addEventListener('click', function(){
-        common.incrementCurrent();
+        pagenation.incrementCurrent();
         writeContent();
         updatePagenation();
     }, false);
@@ -199,6 +199,6 @@ async function getJsondata() {
 
 window.onload = async function(){
     const resData = await getJsondata();
-    common = new Common(resData);
+    pagenation = new Pagenation(resData);
     initTable();
 }
