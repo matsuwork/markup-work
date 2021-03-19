@@ -29,7 +29,7 @@ class Pagenation {
     }
 }
 
-function writeContent(){
+function writeContent(pagenation){
     const contentData = pagenation.getContent();
     const table = document.querySelector('table');
 
@@ -46,7 +46,7 @@ function writeContent(){
     }
 }
 
-function updatePagenation() {
+function updatePagenation(pagenation) {
     const p = document.querySelector('.current');
     p.textContent = `${pagenation.getCurrentPage()}/${pagenation.getTotalPage()}`;
 
@@ -72,7 +72,7 @@ function updateSortButton(clickedButton) {
     clickedButton.disabled = true;
 }
 
-function initTable() {
+function initTable(pagenation) {
     const table = document.createElement('table');
     //table header
     const tr = document.createElement('tr');
@@ -91,8 +91,8 @@ function initTable() {
                 pagenation.setCurrentPage(1);
                 pagenation.setSortType(1);
                 pagenation.setSortKey(key);
-                writeContent();
-                updatePagenation();
+                writeContent(pagenation);
+                updatePagenation(pagenation);
                 updateSortButton(this);
             }, false);
 
@@ -104,8 +104,8 @@ function initTable() {
                 pagenation.setCurrentPage(1);
                 pagenation.setSortType(-1);
                 pagenation.setSortKey(key);
-                writeContent();
-                updatePagenation();
+                writeContent(pagenation);
+                updatePagenation(pagenation);
                 updateSortButton(this);
             }, false);
 
@@ -137,8 +137,8 @@ function initTable() {
     prevButton.disabled = true;
     prevButton.addEventListener('click', function(){
         pagenation.setCurrentPage(pagenation.getCurrentPage() - 1);
-        writeContent();
-        updatePagenation();
+        writeContent(pagenation);
+        updatePagenation(pagenation);
     }, false);
     //next
     const nextButton = document.createElement('button');
@@ -146,8 +146,8 @@ function initTable() {
     nextButton.textContent = '▶';
     nextButton.addEventListener('click', function(){
         pagenation.setCurrentPage(pagenation.getCurrentPage() + 1);
-        writeContent();
-        updatePagenation();
+        writeContent(pagenation);
+        updatePagenation(pagenation);
     }, false);
     //current
     const p = document.createElement('p');
@@ -161,8 +161,8 @@ function initTable() {
     div.appendChild(p);
     div.appendChild(nextButton);
 
-    writeContent();
-    updatePagenation();
+    writeContent(pagenation);
+    updatePagenation(pagenation);
 }
 
 function getJson() {
@@ -193,6 +193,6 @@ async function getJsondata() {
 
 window.onload = async function(){
     const resData = await getJsondata();
-    pagenation = new Pagenation(resData);
-    initTable();
+    const instancePagenation = new Pagenation(resData);
+    initTable(instancePagenation);
 }
