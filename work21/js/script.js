@@ -9,21 +9,18 @@ class Pagenation {
         this.sortKey = '';
     }
 
-    get data() {return this._data;}
-    set data(value) {this._data = value;}
+    getCurrentPage() {return this.currentPage;}
+    setCurrentPage(value) {this.currentPage = value;}
 
-    get currentPage() {return this._currentPage;}
-    set currentPage(value) {this._currentPage = value;}
+    getSortType() {return this.sortType;}
+    setSortType(value) {this.sortType = value;}
 
-    get sortType() {return this._sortType;}
-    set sortType(value) {this._sortType = value;}
+    getSortKey() {return this.sortKey;}
+    setSortKey(value) {this.sortKey = value;}
 
-    get sortKey() {return this._sortKey;}
-    set sortKey(value) {this._sortKey = value;}
+    getKeys() {return Object.keys(this.data[0]);}
 
-    get keys() {return Object.keys(this.data[0]);}
-
-    get totalPage() {return this.data.length % MAX_ROW === 0 ? this.data.length / MAX_ROW : Math.floor(this.data.length / MAX_ROW) + 1;}
+    getTotalPage() {return this.data.length % MAX_ROW === 0 ? this.data.length / MAX_ROW : Math.floor(this.data.length / MAX_ROW) + 1;}
 
     incrementCurrent() {this.currentPage++;}
     decrementCurrent() {this.currentPage--;}
@@ -40,11 +37,11 @@ function writeContent(){
     const table = document.querySelector('table');
 
     for (let i = 0 ; i < MAX_ROW ; i++) {
-        for(let j = 0 ; j < pagenation.keys.length ; j++) {
+        for(let j = 0 ; j < pagenation.getKeys().length ; j++) {
             const targetTd = table.rows[i + 1].cells[j];
 
             if(i < contentData.length) {
-                targetTd.innerHTML = contentData[i][pagenation.keys[j]];
+                targetTd.innerHTML = contentData[i][pagenation.getKeys()[j]];
             } else {
                 targetTd.innerHTML = '';
             }
@@ -54,18 +51,18 @@ function writeContent(){
 
 function updatePagenation() {
     const p = document.querySelector('.current');
-    p.textContent = `${pagenation.currentPage}/${pagenation.totalPage}`;
+    p.textContent = `${pagenation.getCurrentPage()}/${pagenation.getTotalPage()}`;
 
     const prevButton = p.previousElementSibling;
     const nextButton = p.nextElementSibling;
 
-    if(pagenation.currentPage === 1){
+    if(pagenation.getCurrentPage() === 1){
         prevButton.disabled = true;
     } else {
         prevButton.disabled = false;
     }
 
-    if(pagenation.currentPage === pagenation.totalPage){
+    if(pagenation.getCurrentPage() === pagenation.getTotalPage()){
         nextButton.disabled = true;
     } else {
         nextButton.disabled = false;
@@ -82,7 +79,7 @@ function initTable() {
     const table = document.createElement('table');
     //table header
     const tr = document.createElement('tr');
-    pagenation.keys.forEach((key) => {
+    pagenation.getKeys().forEach((key) => {
         const th = document.createElement('th');
         th.textContent = key;
         tr.appendChild(th);
@@ -94,9 +91,9 @@ function initTable() {
             ascendingButton.textContent = '▲';
             ascendingButton.classList.add('sort-button');
             ascendingButton.addEventListener('click', function(){
-                pagenation.currentPage = 1;
-                pagenation.sortType = 1;
-                pagenation.sortKey = key;
+                pagenation.setCurrentPage(1);
+                pagenation.setSortType(1);
+                pagenation.setSortKey(key);
                 writeContent();
                 updatePagenation();
                 updateSortButton(this);
@@ -107,9 +104,9 @@ function initTable() {
             descendingButton.textContent = '▼';
             descendingButton.classList.add('sort-button');
             descendingButton.addEventListener('click', function(){
-                pagenation.currentPage = 1;
-                pagenation.sortType = -1;
-                pagenation.sortKey = key;
+                pagenation.setCurrentPage(1);
+                pagenation.setSortType(-1);
+                pagenation.setSortKey(key);
                 writeContent();
                 updatePagenation();
                 updateSortButton(this);
@@ -127,7 +124,7 @@ function initTable() {
     const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < MAX_ROW ; i++) {
         const tr = document.createElement('tr');
-        for(let j = 0 ; j < pagenation.keys.length ; j++) {
+        for(let j = 0 ; j < pagenation.getKeys().length ; j++) {
             const td = document.createElement('td');
             tr.appendChild(td);
         }
