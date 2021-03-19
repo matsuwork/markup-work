@@ -22,9 +22,6 @@ class Pagenation {
 
     getTotalPage() {return this.data.length % MAX_ROW === 0 ? this.data.length / MAX_ROW : Math.floor(this.data.length / MAX_ROW) + 1;}
 
-    incrementCurrent() {this.currentPage++;}
-    decrementCurrent() {this.currentPage--;}
-
     getContent() {
         const sortedData = [...this.data].sort((a, b) => {return (a[this.sortKey] - b[this.sortKey]) * this.sortType});
         const slicedData = sortedData.slice((this.currentPage - 1) * MAX_ROW, this.currentPage * MAX_ROW);
@@ -139,7 +136,7 @@ function initTable() {
     prevButton.textContent = '◀';
     prevButton.disabled = true;
     prevButton.addEventListener('click', function(){
-        pagenation.decrementCurrent();
+        pagenation.setCurrentPage(pagenation.getCurrentPage() - 1);
         writeContent();
         updatePagenation();
     }, false);
@@ -148,7 +145,7 @@ function initTable() {
     nextButton.type = 'button';
     nextButton.textContent = '▶';
     nextButton.addEventListener('click', function(){
-        pagenation.incrementCurrent();
+        pagenation.setCurrentPage(pagenation.getCurrentPage() + 1);
         writeContent();
         updatePagenation();
     }, false);
