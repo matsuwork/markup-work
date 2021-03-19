@@ -18,7 +18,7 @@ class Pagenation {
     getSortKey() {return this.sortKey;}
     setSortKey(value) {this.sortKey = value;}
 
-    getKeys() {return Object.keys(this.data[0]);}
+    getHeaders() {return Object.keys(this.data[0]);}
 
     getTotalPage() {return this.data.length % MAX_ROW === 0 ? this.data.length / MAX_ROW : Math.floor(this.data.length / MAX_ROW) + 1;}
 
@@ -34,11 +34,11 @@ function writeContent(pagenation){
     const table = document.querySelector('table');
 
     for (let i = 0 ; i < MAX_ROW ; i++) {
-        for(let j = 0 ; j < pagenation.getKeys().length ; j++) {
+        for(let j = 0 ; j < pagenation.getHeaders().length ; j++) {
             const targetTd = table.rows[i + 1].cells[j];
 
             if(i < contentData.length) {
-                targetTd.innerHTML = contentData[i][pagenation.getKeys()[j]];
+                targetTd.innerHTML = contentData[i][pagenation.getHeaders()[j]];
             } else {
                 targetTd.innerHTML = '';
             }
@@ -76,7 +76,7 @@ function initTable(pagenation) {
     const table = document.createElement('table');
     //table header
     const tr = document.createElement('tr');
-    pagenation.getKeys().forEach((key) => {
+    pagenation.getHeaders().forEach((key) => {
         const th = document.createElement('th');
         th.textContent = key;
         tr.appendChild(th);
@@ -121,7 +121,7 @@ function initTable(pagenation) {
     const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < MAX_ROW ; i++) {
         const tr = document.createElement('tr');
-        for(let j = 0 ; j < pagenation.getKeys().length ; j++) {
+        for(let j = 0 ; j < pagenation.getHeaders().length ; j++) {
             const td = document.createElement('td');
             tr.appendChild(td);
         }
