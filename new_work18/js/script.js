@@ -1,5 +1,5 @@
 /*json
-{ "image": [
+{ "images": [
     {"src" : "img/img1.jpg", "alt" : "画像１"},
     {"src" : "img/img2.jpg", "alt" : "画像２"},
     {"src" : "img/img3.jpg", "alt" : "画像３"},
@@ -8,6 +8,7 @@
 ]}
 */
 
+const url = 'https://jsondata.okiba.me/v1/json/pzi02210324121534'
 const sliderUl = document.getElementById('slider');
 let slideLists; //初期表示時に設定 sliderUlの中にあるliすべて
 let timer;      //setTimeoutのID
@@ -134,7 +135,7 @@ function nextImage() {
 function getJson() {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const response = fetch('https://jsondata.okiba.me/v1/json/grhYz210215052753');
+            const response = fetch(url);
             resolve(response);
         }, 3000);
     });
