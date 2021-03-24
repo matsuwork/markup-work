@@ -11,7 +11,7 @@
 const url = 'https://jsondata.okiba.me/v1/json/pzi02210324121534'
 const sliderUl = document.getElementById('slider');
 let slideLists; //初期表示時に設定 sliderUlの中にあるliすべて
-let timer;      //setTimeoutのID
+let setTimeoutId;
 
 function getActive() {
     const activeLi = document.querySelector( '.is-active' ) ;
@@ -110,8 +110,8 @@ function updateControl() {
 }
 
 function setTimer() {
-    clearTimeout(timer);
-    timer = setTimeout(nextImage, 3000);
+    clearTimeout(setTimeoutId);
+    setTimeoutId = setTimeout(nextImage, 3000);
 }
 
 function showImage(value) {
