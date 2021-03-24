@@ -138,10 +138,6 @@ function getJson() {
 };
 
 async function getJsonimage() {
-    const loading = document.createElement('img');
-    loading.src = "img/loading-circle.gif";
-    sliderUl.appendChild(loading);
-
     try {
         const response = await getJson();
         const resJson = await response.json();
@@ -149,13 +145,14 @@ async function getJsonimage() {
     } catch (err) {
         sliderUl.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
         throw err;
-    } finally {
-        loading.remove();
     }
-
 };
 
 window.onload = async function(){
-    const resImage = await getJsonimage()
+    const loading = document.createElement('img');
+    loading.src = "img/loading-circle.gif";
+    sliderUl.appendChild(loading);
+    const resImage = await getJsonimage();
+    loading.remove();
     initSlider(resImage);
 }
