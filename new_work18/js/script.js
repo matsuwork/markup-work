@@ -18,6 +18,14 @@ function getActive() {
     return slideLists.indexOf( activeLi );
 }
 
+const isFirst = () => {
+    return getActive() === 0;
+}
+
+const isLast = () => {
+    return getActive() === slideLists.length - 1;
+}
+
 function initSlider(images) {
     const displayDiv = document.querySelector('div');
     displayDiv.classList.add('display')
@@ -87,17 +95,9 @@ function updateControl() {
     //prev/next button
     const prevButton = sliderUl.previousElementSibling;
     const nextButton = sliderUl.nextElementSibling;
-    if(getActive() === 0){
-        prevButton.disabled = true;
-    } else {
-        prevButton.disabled = false;
-    }
 
-    if(getActive() === slideLists.length - 1){
-        nextButton.disabled = true;
-    } else {
-        nextButton.disabled = false;
-    }
+    isFirst() ? prevButton.disabled = true : prevButton.disabled = false;
+    isLast() ? nextButton.disabled = true : nextButton.disabled = false;
 
     //current
     const currentDiv = document.querySelector('.current');
@@ -125,11 +125,7 @@ function showImage(value) {
 }
 
 function nextImage() {
-    if(getActive() < slideLists.length - 1 ) {
-        showImage(getActive() + 1);
-    } else {
-        showImage(0);
-    }
+    isLast() ? showImage(0) : showImage(getActive() + 1);
 }
 
 function getJson() {
@@ -149,7 +145,7 @@ async function getJsonimage() {
     try {
         const response = await getJson();
         const resJson = await response.json();
-        return resJson.image;
+        return resJson.images;
     } catch (err) {
         sliderUl.innerHTML = 'ただいまサーバー側で通信がぶっ壊れています';
         throw err;
