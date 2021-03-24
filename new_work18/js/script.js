@@ -26,15 +26,9 @@ const isLast = () => {
     return getActive() === slideLists.length - 1;
 }
 
-function initSlider(images) {
-    const displayDiv = document.querySelector('div');
-    displayDiv.classList.add('display')
-    const dotDiv = document.createElement('div');
-    dotDiv.classList.add('dot')
-
+function createImages(images) {
     const fragment = document.createDocumentFragment();
     for (let i = 0 ; i < images.length ; i++) {
-        //image
         const li = document.createElement('li');
         li.classList.add('slider__list');
         const img = document.createElement('img');
@@ -48,8 +42,16 @@ function initSlider(images) {
 
         li.appendChild(img);
         fragment.appendChild(li);
+    }
+    sliderUl.appendChild(fragment);
+}
 
-        //dot button
+function createDotButtons(images) {
+    const displayDiv = document.querySelector('div');
+    displayDiv.classList.add('display')
+    const dotDiv = document.createElement('div');
+    dotDiv.classList.add('dot')
+    for (let i = 0 ; i < images.length ; i++) {
         const dotButton = document.createElement('button');
         dotButton.type = 'button';
         dotButton.textContent = '●';
@@ -58,11 +60,10 @@ function initSlider(images) {
         }, false);
         dotDiv.appendChild(dotButton)
     }
-
-    sliderUl.appendChild(fragment);
     displayDiv.after(dotDiv);
+}
 
-    //prev/next button
+function createArrowButtons() {
     const prevButton = document.createElement('button');
     prevButton.type = 'button';
     prevButton.textContent = '◀';
@@ -79,31 +80,34 @@ function initSlider(images) {
 
     sliderUl.before(prevButton);
     sliderUl.after(nextButton);
+}
 
-    //current
+function createCurrent() {
+    const dotDiv = document.querySelector('.dot');
     const currentDiv = document.createElement('div');
     currentDiv.classList.add('current')
     dotDiv.after(currentDiv);
+}
 
-    //slideListsの設定
+function initSlider(images) {
+    createImages(images);
+    createDotButtons(images);
+    createArrowButtons();
+    createCurrent();
     slideLists = [...document.querySelectorAll( '.slider__list' )];
-
     showImage(0);
 }
 
 function updateControl() {
-    //prev/next button
     const prevButton = sliderUl.previousElementSibling;
     const nextButton = sliderUl.nextElementSibling;
 
     isFirst() ? prevButton.disabled = true : prevButton.disabled = false;
     isLast() ? nextButton.disabled = true : nextButton.disabled = false;
 
-    //current
     const currentDiv = document.querySelector('.current');
     currentDiv.textContent = `${getActive() + 1}/${slideLists.length}`;
 
-    //dot button
     const dotDiv = document.querySelector('.dot');
     [...dotDiv.children].forEach(item => item.disabled = false);
     dotDiv.children[getActive()].disabled = true;
