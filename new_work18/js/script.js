@@ -18,20 +18,20 @@ function getActive() {
     return slideLists.indexOf( activeLi );
 }
 
-function initSlider(resImage) {
+function initSlider(images) {
     const displayDiv = document.querySelector('div');
     displayDiv.classList.add('display')
     const dotDiv = document.createElement('div');
     dotDiv.classList.add('dot')
 
     const fragment = document.createDocumentFragment();
-    for (let i = 0 ; i < resImage.length ; i++) {
+    for (let i = 0 ; i < images.length ; i++) {
         //image
         const li = document.createElement('li');
         li.classList.add('slider__list');
         const img = document.createElement('img');
-        img.src = resImage[i].src;
-        img.alt = resImage[i].alt;
+        img.src = images[i].src;
+        img.alt = images[i].alt;
         img.width = 400;
 
         img.addEventListener('click', function(){
