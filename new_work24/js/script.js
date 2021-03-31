@@ -54,10 +54,10 @@ submitBtn.addEventListener('click', function(e){
 const terms = document.querySelector(".modal__content")
 const end = document.getElementById("end");
 const options = {root: terms};
-const observer = new IntersectionObserver(checkBox, options);
-observer.observe(end);
+const termsObserver = new IntersectionObserver(enableCheckbox, options);
+termsObserver.observe(end);
 
-function checkBox(entries) {
+function enableCheckbox(entries, observer) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
         if(checkCloseBtn.disabled) {
@@ -65,8 +65,9 @@ function checkBox(entries) {
         };
         if(checkbox.disabled){
             checkbox.disabled = false;
-        }
-    }
+        };
+        observer.unobserve(end);
+    };
   });
 };
 
