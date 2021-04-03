@@ -44,7 +44,7 @@ checkCloseBtn.addEventListener('click', function(){
 }, false);
 
 window.addEventListener('click', function(e) {
-    if (e.target == modal) {
+    if (e.target === modal) {
         closeModal();
     }
 });
