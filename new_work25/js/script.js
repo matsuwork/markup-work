@@ -70,7 +70,7 @@ function updateSubmit() {
     } else {
         isValid = form.checkValidity();
     }
-    isValid ? submitBtn.disabled = false : submitBtn.disabled = true;
+    submitBtn.disabled = !isValid
 };
 
 //observer
