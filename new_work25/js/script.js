@@ -65,11 +65,7 @@ function visibleNote(target) {
 
 function updateSubmit() {
     let isValid;
-    if(checkbox.disabled) {
-        isValid = false;
-    } else {
-        isValid = form.checkValidity();
-    }
+    isValid = checkbox.disabled ? false : form.checkValidity();
     submitBtn.disabled = !isValid
 };
 
