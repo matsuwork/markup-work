@@ -40,38 +40,28 @@ form.addEventListener('submit', function(e){
     login(getFormData());
 }, false);
 
-function getUsers() {
-    const users = [
-        {
-            name: "kenjimorita",
-            password: "N302aoe3"
-        },
-        {
-            name: "matsudaakane",
-            password: "N302aoe3"
-        }
-    ];
+function checkRegistered(values) {
     return new Promise((resolve,reject) => {
-        resolve(users);
-    });
-};
+        const dummyUserData = [
+            {
+                name: "kenjimorita",
+                password: "N302aoe3"
+            },
+            {
+                name: "matsudaakane",
+                password: "N302aoe3"
+            }
+        ];
+        const isUser = dummyUserData.some(
+            u => u.name === values.name && u.password === values.password
+        );
 
-function checkRegistered(users,user) {
-    const registered = users.some(
-        u => u.name === user.name && u.password === user.password
-    );
-    return new Promise((resolve,reject) => {
-        if (registered) {
-            resolve(true);
-        } else {
-            reject('違います');
-        }
+        return resolve(isUser);
     });
 };
 
 async function login(userData) {
     try {
-        const resUsers = await getUsers();
         const result = await checkRegistered(resUsers,userData);
         if(result){
             localStorage.setItem('token', 'far0fja*ff]afaawfqrlzkfq@aq9283af');
