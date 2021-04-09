@@ -61,15 +61,16 @@ function checkRegistered(values) {
 };
 
 async function login(userData) {
+    let result;
     try {
-        const result = await checkRegistered(resUsers,userData);
-        if(result){
-            localStorage.setItem('token', 'far0fja*ff]afaawfqrlzkfq@aq9283af');
-            location.href="index.html";
-        } else {
-            location.href="failure.html";
-        }
+        result = await checkRegistered(userData);
     } catch (err) {
+        result = false;
+    };
+    if(result){
+        localStorage.setItem('token', 'far0fja*ff]afaawfqrlzkfq@aq9283af');
+        location.href="index.html";
+    } else {
         location.href="failure.html";
     }
 };
