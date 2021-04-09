@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded',function(){
 },false);
 
 function getFormData() {
-    let data = {};
-    data.name = form.elements['name'].value;
-    data.password = form.elements['password'].value;
-    return data;
+    return {
+        name: form.elements['name'].value,
+        password: form.elements['password'].value
+    }
 }
 
 form.addEventListener('submit', function(e){
