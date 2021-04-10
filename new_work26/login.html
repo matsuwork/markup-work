@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="css/form.css" type="text/css" />
+    <title>TerraceTechフロントエンドエンジニア養成所</title>
+  </head>
+  <body>
+    <div class="register">
+      <h1>ログイン</h1>
+      <form id="form">
+        <ul>
+          <li>
+            <label for="name">ユーザー名</label><input type="text" name="name" id="name" required maxlength="15">
+            <p class="note">※ユーザー名は15文字以下です。</p>
+          </li>
+          <li>
+            <label for="password">パスワード</label><input type="password" name="password" id="password" required pattern="^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d)[a-zA-Z\d]{8,}$">
+            <p class="note">※8文字以上の大小の英数字を交ぜたものです。</p>
+          </li>
+        </ul>
+        <p>※パスワードを忘れた方は<a href="forgotpassword.html">こちら</a></p>
+        <p><a href="register.html">会員登録はこちら</a></p>
+        <button type="submit" id="submit">送信</button>
+      </form>
+    </div>
+    <script src="js/login.js"></script>
+  </body>
+</html>
