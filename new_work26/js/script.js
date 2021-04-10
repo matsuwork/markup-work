@@ -70,6 +70,7 @@ window.onload = async function(){
     const body = document.querySelector('body');
     const loading = document.createElement('img');
     loading.src = "img/loading-circle.gif";
+    loading.id = loading;
     body.insertBefore(loading, body.firstChild)
 
     const response = await Promise.all(urls.map(url => getJson(url)))
