@@ -134,6 +134,7 @@ a:hover {
 
 .logout {
     font-size: 15px;
-    margin: 0 0 0 auto;
-    display: block;
+    position : absolute;
+    right: 32px;
+    top: 32px;
 }
