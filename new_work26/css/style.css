@@ -131,3 +131,10 @@ a:hover {
     vertical-align: middle;
     margin-right: 2px;
 }
+
+.logout {
+    font-size: 15px;
+    position : absolute;
+    right: 32px;
+    top: 32px;
+}
